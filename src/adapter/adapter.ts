@@ -587,7 +587,7 @@ export class AgyAdapter extends LlmAdapter {
             `agy rate-limited (${response.status}): ${classified.message ?? ''}`,
             'RATE_LIMIT',
             {
-              providerRetryAfterMs: classified.retryAfterMs ?? undefined,
+              providerRetryAfterMs: classified.retryAfterMs ?? 5_000,
               requestId: ProviderRequestId(generateAntigravityRequestId()),
             },
           )

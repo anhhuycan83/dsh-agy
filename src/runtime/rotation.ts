@@ -124,7 +124,7 @@ export function clearExpiredState(account: ManagedAccount, now = Date.now()): vo
 /** 24h cooldown for a fully exhausted daily quota (single-account: stop hitting the wall). */
 export const FULL_QUOTA_COOLDOWN_MS = 24 * 60 * 60 * 1000
 /** 5min cooldown for per-minute rate limits. */
-export const RATE_LIMIT_COOLDOWN_MS = 5 * 60 * 1000
+export const RATE_LIMIT_COOLDOWN_MS = 5_000
 /** Cap for a server-reported reset time on per-minute limits (guards against bogus far-future values). */
 export const MAX_RATE_LIMIT_COOLDOWN_MS = 30 * 60 * 1000
 
