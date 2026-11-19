@@ -173,15 +173,22 @@ export function decideRotation(
       }
       if (category === 'quota_exhausted') {
         // Daily/plan quota gone: cool until the real reset when the backend
-        // reported one (capped at 24h), else the fixed daily window.
+        // reported one (capped at 24h), else treat as short burst rate-limit.
         const resetMs = parseFutureResetMs(resetTime, now)
-        const cooldownMs = resetMs !== undefined
-          ? Math.min(resetMs - now, FULL_QUOTA_COOLDOWN_MS)
-          : FULL_QUOTA_COOLDOWN_MS
-        account.coolingDownUntil = now + Math.max(cooldownMs, 60_000)
-        account.cooldownReason = 'quota-exhausted'
+        if (resetMs !== undefined) {
+          const cooldownMs = Math.min(resetMs - now, FULL_QUOTA_COOLDOWN_MS)
+          account.coolingDownUntil = now + Math.max(cooldownMs, 60_000)
+          account.cooldownReason = 'quota-exhausted'
+          account.cooldownSetAt = now
+          return { action: 'cool', backoffMs: Math.max(cooldownMs, 60_000) }
+        }
+        // Google 429 returns generic "RESOURCE_EXHAUSTED" without resetTime for short TPM/RPM bursts.
+        // Do NOT lock the account for 24 hours on a burst limit!
+        const burstCooldownMs = Math.min(retryAfterMs ?? 15_000, MAX_RATE_LIMIT_COOLDOWN_MS)
+        account.coolingDownUntil = now + Math.max(burstCooldownMs, 5_000)
+        account.cooldownReason = undefined
         account.cooldownSetAt = now
-        return { action: 'cool', backoffMs: Math.max(cooldownMs, 60_000) }
+        return { action: 'rotate', backoffMs: Math.max(burstCooldownMs, 5_000) }
       }
       // Per-minute rate limit: prefer the server's real reset (capped), then
       // Retry-After, then the fixed short window. The family-scoped reset is

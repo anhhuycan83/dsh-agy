@@ -68,8 +68,8 @@ export const AGY_ENDPOINT_AUTOPUSH = 'https://autopush-cloudcode-pa.sandbox.goog
 /** Runtime/bootstrap endpoint fallback order (daily first, mirroring OmniRoute). */
 export const AGY_ENDPOINT_FALLBACKS: readonly string[] = [
   AGY_ENDPOINT_DAILY,
-  AGY_ENDPOINT_PROD,
   AGY_ENDPOINT_DAILY_SANDBOX,
+  AGY_ENDPOINT_PROD,
   AGY_ENDPOINT_AUTOPUSH,
 ]
 
