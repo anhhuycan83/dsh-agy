@@ -115,8 +115,13 @@ export function classifyRateLimit(
   if (retryAfterMs !== undefined) {
     return 'rate_limited'
   }
-  // No explicit retry hint: "quota" wording → daily quota, otherwise unknown.
-  return text.includes('quota') || text.includes('resource_exhausted') ? 'quota_exhausted' : 'unknown'
+  // Standard Google 429 returns generic "Resource has been exhausted (e.g. check quota)." for transient burst/RPM limit.
+  // Unless there is an explicit daily/plan quota exhausted keyword, treat as rate_limited so it can retry/backoff.
+  const hasExplicitQuotaKeyword = text.includes('daily quota') || text.includes('quota exceeded') || text.includes('free tier limit')
+  if (hasExplicitQuotaKeyword) {
+    return 'quota_exhausted'
+  }
+  return 'rate_limited'
 }
 
 const RATE_LIMIT_RESET_FIELDS = ['resetTime', 'reset_time', 'resetAt', 'quotaResetTime'] as const

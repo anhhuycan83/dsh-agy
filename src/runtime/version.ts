@@ -39,7 +39,7 @@ function compareSemver(a: string, b: string): number {
 
 function pickNewestVersion(...versions: Array<unknown>): string | null {
   const valid = versions
-    .filter((v): v is string => typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v))
+    .filter((v): v is string => typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v) && compareSemver(v, '2.28.0') >= 0)
   if (valid.length === 0) return null
   return valid.reduce<string | null>((best, v) => (!best || compareSemver(v, best) > 0 ? v : best), null)
 }
