@@ -670,6 +670,14 @@ export function toAgyRequestBody(
     .filter((text): text is string => typeof text === 'string' && text !== '')
     .join('\n\n')
 
+  if (systemText) {
+    if (contents.length > 0 && contents[0].role === 'user') {
+      contents[0].parts.unshift({ text: `<system_instruction>\n${systemText}\n</system_instruction>\n\n` })
+    } else {
+      contents.unshift({ role: 'user', parts: [{ text: `<system_instruction>\n${systemText}\n</system_instruction>` }] })
+    }
+  }
+
   const tools = toolsToDeclarations(options.tools)
   const generationConfig: NonNullable<AgyRequestBody['request']['generationConfig']> = {}
   if (options.temperature !== undefined) generationConfig.temperature = options.temperature
@@ -743,7 +751,7 @@ export function toAgyRequestBody(
     requestType: 'agent',
     request: {
       contents,
-      ...(systemText ? { systemInstruction: { parts: [{ text: systemText }] } } : {}),
+      // systemInstruction moved to contents[0] to prevent Cloud Code PA 429 quota exhaustion
       ...(tools ? { tools } : {}),
       ...(tools ? { toolConfig: { functionCallingConfig: { mode: 'VALIDATED' } } } : {}),
       ...(Object.keys(generationConfig).length > 0 ? { generationConfig } : {}),
