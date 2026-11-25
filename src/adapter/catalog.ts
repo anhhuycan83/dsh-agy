@@ -23,6 +23,7 @@ export interface CatalogModel {
 }
 
 export const AGY_PUBLIC_MODELS: readonly CatalogModel[] = [
+  { id: 'gemini-4-hydrogen', name: 'Gemini 4 Hydrogen', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level', thinkingLevels: ['low', 'medium', 'high'] as const },
   { id: 'gemini-4-argon', name: 'Gemini 4 Argon', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
   { id: 'claude-opus-5-5', name: 'Claude Opus 5.5', contextLength: 200000, maxOutputTokens: 64000, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
   { id: 'claude-sonnet-5-5', name: 'Claude Sonnet 5.5', contextLength: 200000, maxOutputTokens: 64000, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
@@ -54,6 +55,9 @@ export const AGY_PUBLIC_MODELS: readonly CatalogModel[] = [
   { id: 'gemini-4-argon-high', name: 'Gemini 4 Argon (High)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
   { id: 'gemini-4-argon-medium', name: 'Gemini 4 Argon (Medium)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
   { id: 'gemini-4-argon-low', name: 'Gemini 4 Argon (Low)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
+  { id: 'gemini-4-hydrogen-high', name: 'Gemini 4 Hydrogen (High)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
+  { id: 'gemini-4-hydrogen-medium', name: 'Gemini 4 Hydrogen (Medium)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
+  { id: 'gemini-4-hydrogen-low', name: 'Gemini 4 Hydrogen (Low)', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true },
   { id: 'gpt-oss-120b-medium', name: 'GPT-OSS 120B (Medium)', contextLength: 131072, maxOutputTokens: 32768, supportsReasoning: true, toolCalling: true },
 ]
 
@@ -154,6 +158,7 @@ export function registerDiscoveredUnifiedThinkingFamily(baseId: string): void {
 /** Check whether a model ID is a unified thinking family (known static or dynamically discovered). */
 export function isUnifiedThinkingFamily(modelId: string): boolean {
   return (
+    modelId === 'gemini-4-hydrogen' ||
     modelId === 'gemini-4-argon' ||
     modelId === 'claude-opus-5-5' ||
     modelId === 'claude-sonnet-5-5' ||

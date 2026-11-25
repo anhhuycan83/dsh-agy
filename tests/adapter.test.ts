@@ -544,6 +544,15 @@ describe('translate', () => {
   })
 
   it('maps unified thinking models (gemini-4-argon, claude-opus-5-5) to matching wire models based on effort', () => {
+    const lowHydrogen = toAgyRequestBody(generateOptions({ model: 'gemini-4-hydrogen', reasoningEffort: 'low' }), {})
+    expect(lowHydrogen.model).toBe('gemini-4-hydrogen-low')
+
+    const highHydrogen = toAgyRequestBody(generateOptions({ model: 'gemini-4-hydrogen', reasoningEffort: 'high' }), {})
+    expect(highHydrogen.model).toBe('gemini-4-hydrogen-high')
+
+    const medHydrogen = toAgyRequestBody(generateOptions({ model: 'gemini-4-hydrogen' }), {})
+    expect(medHydrogen.model).toBe('gemini-4-hydrogen-medium')
+
     const lowArgon = toAgyRequestBody(generateOptions({ model: 'gemini-4-argon', reasoningEffort: 'low' }), {})
     expect(lowArgon.model).toBe('gemini-4-argon-low')
 
