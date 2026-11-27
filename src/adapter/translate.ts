@@ -701,7 +701,7 @@ export function toAgyRequestBody(
   // default thinking tokens from exhausting tight output caps (e.g. maxTokens: 64).
   let effort = options.reasoningEffort?.toLowerCase()
   if (!effort) {
-    if (options.model.endsWith('-high')) effort = 'high'
+    if (options.model.endsWith('-high') || options.model.endsWith('-xhigh')) effort = 'high'
     else if (options.model.endsWith('-medium')) effort = 'medium'
     else if (options.model.endsWith('-low')) effort = 'low'
   }
@@ -717,17 +717,18 @@ export function toAgyRequestBody(
       if (tiered !== undefined) {
         generationConfig.thinkingConfig = { thinkingBudget: tiered, includeThoughts: true }
       }
-    } else if (LEVEL_THINKING_LEVELS.has(effort) && (levelThinkingEffortsFor(options.model).includes(effort as any) || options.model.startsWith('gemini-4-hydrogen'))) {
+    } else if ((LEVEL_THINKING_LEVELS.has(effort) || effort === 'xhigh') && (levelThinkingEffortsFor(options.model).includes(effort as any) || options.model.startsWith('gemini-4-hydrogen'))) {
+      const normalizedEffort = (effort === 'xhigh' && options.model.startsWith('gemini-4-hydrogen')) ? 'high' : effort
       // A configured number for this level takes the place of the level token:
       // both together would let the level win (see `thinkingBudgetFor`).
-      const configured = context.thinkingBudgetFor?.(effort)
+      const configured = context.thinkingBudgetFor?.(normalizedEffort)
       if (options.model === 'gemini-4-argon' || options.model === 'claude-opus-5-5' || options.model === 'claude-sonnet-5-5') {
         if (configured !== undefined) {
           generationConfig.thinkingConfig = { thinkingBudget: configured, includeThoughts: true }
         }
       } else {
         generationConfig.thinkingConfig = configured === undefined
-          ? { thinkingLevel: effort, includeThoughts: true }
+          ? { thinkingLevel: normalizedEffort, includeThoughts: true }
           : { thinkingBudget: configured, includeThoughts: true }
       }
     }
