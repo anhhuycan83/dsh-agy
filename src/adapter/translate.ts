@@ -593,6 +593,9 @@ function toolsToDeclarations(tools: ToolSchema[] | undefined): AgyRequestBody['r
  * with level thinking, and mapped to the matching discrete wire model on request.
  */
 export function resolveWireModel(model: string, effort?: string): string {
+  if (model === 'gemini-4-hydrogen' || model.startsWith('gemini-4-hydrogen')) {
+    return 'gemini-4-hydrogen-sonar'
+  }
   if (isUnifiedThinkingFamily(model)) {
     const target = effort === 'low' ? 'low' : effort === 'high' ? 'high' : 'medium'
     return `${model}-${target}`
@@ -696,8 +699,13 @@ export function toAgyRequestBody(
   // thinking (see `LEVEL_REASONING` for why declaring a default broke that).
   // When purpose is 'session-title' or reasoning is off, thinkingBudget: 0 prevents
   // default thinking tokens from exhausting tight output caps (e.g. maxTokens: 64).
-  const effort = options.reasoningEffort?.toLowerCase()
-  if (isLevelThinkingModel(options.model)) {
+  let effort = options.reasoningEffort?.toLowerCase()
+  if (!effort) {
+    if (options.model.endsWith('-high')) effort = 'high'
+    else if (options.model.endsWith('-medium')) effort = 'medium'
+    else if (options.model.endsWith('-low')) effort = 'low'
+  }
+  if (isLevelThinkingModel(options.model) || options.model.startsWith('gemini-4-hydrogen')) {
     if (options.purpose === 'session-title' || effort === 'none' || effort === 'off') {
       generationConfig.thinkingConfig = { thinkingBudget: 0 }
     } else if (effort === undefined) {
@@ -709,7 +717,7 @@ export function toAgyRequestBody(
       if (tiered !== undefined) {
         generationConfig.thinkingConfig = { thinkingBudget: tiered, includeThoughts: true }
       }
-    } else if (LEVEL_THINKING_LEVELS.has(effort) && levelThinkingEffortsFor(options.model).includes(effort as any)) {
+    } else if (LEVEL_THINKING_LEVELS.has(effort) && (levelThinkingEffortsFor(options.model).includes(effort as any) || options.model.startsWith('gemini-4-hydrogen'))) {
       // A configured number for this level takes the place of the level token:
       // both together would let the level win (see `thinkingBudgetFor`).
       const configured = context.thinkingBudgetFor?.(effort)

@@ -282,7 +282,7 @@ export function getModelFamilyRank(id: string): number {
 function getGeminiTierWeight(id: string): number {
   const lower = id.toLowerCase()
   if (lower.includes('pro') || lower.includes('ultra')) return 40
-  if (lower.includes('argon')) return 30
+  if (lower.includes('argon') || lower.includes('hydrogen')) return 30
   if (lower.includes('flash') && !lower.includes('lite') && !lower.includes('thinking')) return 30
   if (lower.includes('lite')) return 20
   if (lower.includes('thinking')) return 10
